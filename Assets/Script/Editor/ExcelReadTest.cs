@@ -44,5 +44,12 @@ public class ExcelReadTest
     }
 
 
+    [MenuItem("Tools/GetData")]
+    static void GetData()
+    {
+        Debug.Log(">>> Find Excel File: " + XLSXReader.GetData("Data1","10","data"));
+    }
 
-}
+
+
+    }

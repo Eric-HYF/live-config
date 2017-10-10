@@ -10,9 +10,67 @@ namespace XLSX
     public class XLSXReader
     {
 
+        static Dictionary<string, Dictionary<string, List<string>>> XlsData=new Dictionary<string, Dictionary<string, List<string>>>();
+        static List<string> firstNameList = new List<string>();
+        /// <summary>
+        /// 获取所有的表名
+        /// </summary>
+        /// <returns></returns>
+        public static List<string> GetExcelSheetList()
+        {
+            List<string> sheet = new List<string>();
+            foreach (var sheetName in XlsData)
+            {
+                sheet.Add(sheetName.Key);
+            }
+            return sheet;
+        }
 
+        /// <summary>
+        /// 获取某一行的数据
+        /// </summary>
+        /// <param name="sheetName"></param>
+        /// <param name="rowName"></param>
+        /// <returns></returns>
+        public static List<string> GetRowData(string sheetName,string rowName) {
+            try {
+                Dictionary<string, List<string>> rowList = XlsData[sheetName];
+                List<string> rowData = rowList[rowName];
+                return rowData;
+            }
+            catch (System.Exception e)
+            {
+                System.Console.WriteLine("sheetNameError or rowNameError");
+                UnityEngine.Debug.Log("=== Error : sheetNameError or rowNameError" + "===");
+                return null;
+            }
 
-
+        }
+        /// <summary>
+        /// 获取 行列对应的数据值
+        /// </summary>
+        /// <param name="sheetName"></param>
+        /// <param name="rowName"></param>
+        /// <param name="colName"></param>
+        /// <returns></returns>
+        public static string GetData(string sheetName, string rowName,string colName) {
+            List<string> rowData = GetRowData(sheetName, rowName);
+            if (rowData != null)
+            {
+                for (int i = 0; i < firstNameList.Count; i++)
+                {
+                    if (colName.Equals(firstNameList[i]))
+                    {
+                        return rowData[i];
+                    }
+                }
+                System.Console.WriteLine("colNameError");
+                UnityEngine.Debug.Log("=== Error : colNameError" + "===");
+                return "";
+            }
+            return "";
+           
+        }
 
         /// <summary>
         /// 读取EXCEL文件
@@ -34,7 +92,7 @@ namespace XLSX
                 IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 excelReader.IsFirstRowAsColumnNames = isFirstRowAsColumnNames;
 
-
+                int index = 0;
 
                 do
                 {
@@ -42,7 +100,7 @@ namespace XLSX
 
                     // sheet name
                     Log(">>> Table [{0}]", excelReader.Name);
-
+                    Dictionary<string, List<string>> dicData = new Dictionary<string, List<string>>();
                     // 读取列
                     while (excelReader.Read())
                     {
@@ -50,24 +108,30 @@ namespace XLSX
                         Log("Count[{0}]", excelReader.FieldCount);
 
 
-                        List<string> row = new List<string>();
+                       // List<string> row = new List<string>();
 
-                        for (int i = 0; i < excelReader.FieldCount; i++)
+
+
+
+                        List<string> data = new List<string>();
+
+                        for (int i = 1; i < excelReader.FieldCount; i++)
                         {
                             string value = excelReader.IsDBNull(i) ? "" : excelReader.GetString(i);
                             Log(value);
-
-
+                            data.Add(value);
+                            if (index == 0) {
+                                firstNameList.Add(value);
+                            }
                         }
-
-
-
-
+                        dicData.Add(excelReader.GetString(0), data);
                     }
+                    XlsData.Add(excelReader.Name, dicData);
+                    index++;
                 } while (excelReader.NextResult());
 
 
-                //DataSet result = excelReader.AsDataSet(false);
+                DataSet result = excelReader.AsDataSet();
 
                 //Log(">>>> result: " + result);
 
