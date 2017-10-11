@@ -6,17 +6,13 @@ using System.IO;
 using XLSX;
 
 
-public class ExcelReadTest
+public class ExcelReadTest 
 {
-
-
-
-
 
 
     const string TEST_DATA_PATH = "File/Data.xlsx";
 
-    [MenuItem("Tools/Read Test Data")]
+    [MenuItem("Tools/Read Xlsx Assets")]
     static void ReadTestExcel()
     {
         string path = Path.GetFullPath( Path.Combine(Application.dataPath , TEST_DATA_PATH));
@@ -28,6 +24,7 @@ public class ExcelReadTest
             Debug.Log("Excel is existed");
 
             XLSX.ExcelFile ef = XLSXReader.ReadXLSX(path);
+
             if(ef != null)
             {
                 Debug.Log(">>> Find Excel File: "+ ef);
@@ -43,13 +40,4 @@ public class ExcelReadTest
 
     }
 
-
-    [MenuItem("Tools/GetData")]
-    static void GetData()
-    {
-        Debug.Log(">>> Find Excel File: " + XLSXReader.GetData("Data1","10","data"));
-    }
-
-
-
-    }
+}
